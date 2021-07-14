@@ -1,0 +1,35 @@
+
+rpm --import https://artifacts.elastic.co/GPG-KEY-elasticsearch
+
+vi /etc/yum.repos.d/kibana.repo
+
+[kibana-7.x]
+name=Kibana repository for 7.x packages
+baseurl=https://artifacts.elastic.co/packages/7.x/yum
+gpgcheck=1
+gpgkey=https://artifacts.elastic.co/GPG-KEY-elasticsearch
+enabled=1
+autorefresh=1
+type=rpm-md
+
+
+yum install kibana
+
+or 
+
+wget https://artifacts.elastic.co/downloads/kibana/kibana-7.13.3-x86_64.rpm
+rpm --install kibana-7.13.3-x86_64.rpm
+
+
+
+/bin/systemctl daemon-reload
+/bin/systemctl enable kibana.service
+
+vi /etc/kibana/kibana.yml
+
+#server.port: 5601
+#server.host: "localhost"
+#elasticsearch.hosts: ["http://localhost:9200"]
+
+systemctl start kibana.service
+systemctl status kibana
