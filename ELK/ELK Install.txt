@@ -28,6 +28,7 @@ rpm --install elasticsearch-7.13.3-x86_64.rpm
 
 vi /etc/elasticsearch/elasticsearch.yml
 
+'#' => 제거 후 아래와 같이 변경
 network.host: 0.0.0.0
 http.port: 9200
 discovery.seed_hosts: ["127.0.0.1"]
@@ -38,6 +39,7 @@ cluster.initial_master_nodes: ["TK-ELK"]
 systemctl start elasticsearch.service
 
 systemctl status elasticsearch
+-> active (running)
 
 netstat -anpt | grep 9200
 tcp6       0      0 :::9200                 :::*                    LISTEN      27025/java

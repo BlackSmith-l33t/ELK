@@ -24,9 +24,12 @@ rpm --install kibana-7.13.3-x86_64.rpm
 
 vi /etc/kibana/kibana.yml
 
-#server.port: 5601
+'#' => 제거
+#server.port: 5601  
 #server.host: "localhost"
-#elasticsearch.hosts: ["http://localhost:9200"]
+#elasticsearch.hosts: ["http://localhost:9200"] 
 
 systemctl start kibana.service
 systemctl status kibana
+
+-> active (running)
