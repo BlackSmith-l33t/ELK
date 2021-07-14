@@ -12,15 +12,12 @@ enabled=1
 autorefresh=1
 type=rpm-md
 
-
 yum install kibana
 
 or 
 
 wget https://artifacts.elastic.co/downloads/kibana/kibana-7.13.3-x86_64.rpm
 rpm --install kibana-7.13.3-x86_64.rpm
-
-
 
 /bin/systemctl daemon-reload
 /bin/systemctl enable kibana.service
