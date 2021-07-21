@@ -12,7 +12,7 @@ enabled=1
 autorefresh=1
 type=rpm-md
 
-yum install kibana
+yum -y install kibana
 
 or 
 
@@ -26,10 +26,12 @@ vi /etc/kibana/kibana.yml
 
 '#' => 제거
 #server.port: 5601  
-#server.host: "localhost"
+#server.host: "0.0.0.0"
 #elasticsearch.hosts: ["http://localhost:9200"] 
 
 systemctl start kibana.service
 systemctl status kibana
 
 -> active (running)
+
+netstat -anpt | grep 5601

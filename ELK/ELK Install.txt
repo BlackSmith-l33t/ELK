@@ -6,11 +6,11 @@
 
 yum -y update 
 yum list java-*jdk
-yum -y install java-1.8.0-openjdk.x86_64
+yum -y install java-1.8.0-openjdk.x86_64 or java-11-openjdk.x86_64 
 java -version 
 rpm --import https://artifacts.elastic.co/GPG-KEY-elasticsearch
 
-vi /etc/yum.repos.d/elasticsearch.repos
+vi /etc/yum.repos.d/elasticsearch.repo
 
 [elasticsearch]
 name=Elasticsearch repository for 7.x packages
@@ -20,6 +20,8 @@ gpgkey=https://artifacts.elastic.co/GPG-KEY-elasticsearch
 enabled=0
 autorefresh=1
 type=rpm-md
+
+yum install --enablerepo=elasticsearch elasticsearch
 
 or
 
