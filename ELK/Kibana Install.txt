@@ -21,6 +21,9 @@ rpm --install kibana-7.13.3-x86_64.rpm
 
 /bin/systemctl daemon-reload
 /bin/systemctl enable kibana.service
+systemctl start kibana.service
+systemctl status kibana
+-> active (running)
 
 vi /etc/kibana/kibana.yml
 
@@ -29,9 +32,8 @@ vi /etc/kibana/kibana.yml
 #server.host: "0.0.0.0"
 #elasticsearch.hosts: ["http://localhost:9200"] 
 
-systemctl start kibana.service
-systemctl status kibana
+systemctl restart kibana.service
 
--> active (running)
 
-netstat -anpt | grep 5601
+
+

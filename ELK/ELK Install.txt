@@ -28,6 +28,18 @@ or
 wget https://artifacts.elastic.co/downloads/elasticsearch/elasticsearch-7.13.3-x86_64.rpm
 rpm --install elasticsearch-7.13.3-x86_64.rpm
 
+ps -p 1
+
+/bin/systemctl daemon-reload
+/bin/systemctl enable elasticsearch.service
+systemctl start elasticsearch.service
+systemctl status elasticsearch
+-> active (running)
+
+netstat -anpt | grep 9200
+tcp6       0      0 127.0.0.1:9200          :::*                    LISTEN      26706/java
+tcp6       0      0 ::1:9200                :::*                    LISTEN      26706/java
+
 vi /etc/elasticsearch/elasticsearch.yml
 
 '#' => 제거 후 아래와 같이 변경
@@ -36,15 +48,7 @@ http.port: 9200
 discovery.seed_hosts: ["127.0.0.1"]
 cluster.initial_master_nodes: ["TK-ELK"]
 
-/bin/systemctl daemon-reload
-/bin/systemctl enable elasticsearch.service
-systemctl start elasticsearch.service
-
-systemctl status elasticsearch
--> active (running)
-
-netstat -anpt | grep 9200
-tcp6       0      0 :::9200                 :::*                    LISTEN      27025/java
+systemctl restart elasticsearch.service
 
 curl -X GET "localhost:9200/?pretty"
 
