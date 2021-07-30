@@ -33,7 +33,7 @@ vi /etc/kibana/kibana.yml
 #elasticsearch.hosts: ["http://localhost:9200"] 
 
 systemctl restart kibana.service
-
+systemctl restart elasticsearch.service
 
 
 
