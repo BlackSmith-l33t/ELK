@@ -1,0 +1,83 @@
+cd /usr/share/logstash/bin
+./system-install
+Using bundled JDK: /usr/share/logstash/jdk
+OpenJDK 64-Bit Server VM warning: Option UseConcMarkSweepGC was deprecated in version 9.0 and will likely be removed in a future release.
+OpenJDK 64-Bit Server VM warning: INFO: os::commit_memory(0x00000000ca660000, 899284992, 0) failed; error='Not enough space' (errno=12)
+./system-install: line 88: #: command not found
+Unable to install system startup script for Logstash.
+
+원인 : 
+- 시스템의 물리적 RAM 또는 스왑 공간이 부족
+- 프로세스 크기 제한에 도달
+
+해결 방법 : 
+- 시스템의 메모리 로드 줄이기
+- 물리적 메모리 또는 스왑 공간 늘리기
+- 스왑 백킹 저장소가 가득 차 있는지 확인
+- 64 비트 OS에서 64비트 Java 사용
+- Java 힙 크기 줄이기 (-Xmx /-Xms)
+- Java 스레드 수 줄이기
+- Java 스레드 스택 크기 줄이기 (-Xss)
+- -XX:ReservedCodeCacheSize= 를 사용하여 더 큰 코드 캐시 설정
+
+swap 공간을 확인 -> 
+free -h
+              total        used        free      shared  buff/cache   available
+Mem:           3.9G        3.1G        220M        428K        556M        546M
+Swap:            0B          0B          0B
+
+: swap 공간이 전부 0인것을 확인
+-> 해결 방법 : swap 파일을 만들어주고 2G의 메모리를 할당
+
+touch /var/spool/swap/swapfile 
+touch: cannot touch ‘/var/spool/swap/swapfile’: No such file or directory
+: 원인은 아직 알수 없으나 먹히지 않음
+
+dd if=/dev/zero of=/var/spool/swap/swapfile count=2048000 bs=1024
+dd: failed to open ‘/var/spool/swap/swapfile’: No such file or directory
+: 원인은 알수 없으나 먹히지 않음
+
+fallocate를 이용해 파일 생성
+fallocate --length 2g /swapfile
+
+[참고]
+실제로 file 명령을 통해 파일의 유형을 확인해 보면 단순 data파일임을 알수있음.
+file /swapfile
+/swapfile: data
+
+파일 사용 권한 설정
+chmod 600 /swapfile
+퍼미션 설정은 파일 소유자(root)로 제한
+ls -al swapfile
+ls: cannot access swapfile: No such file or directory 
+: 읭??
+
+swap 파일 설정
+단순 data 파일을 swap 파일로 초기화
+mkswap /swapfile
+Setting up swapspace version 1, size = 2 GiB (2147479552 bytes)
+no label, UUID=1b97c2c7-20c0-4be5-b29d-fff55e3ddd3c
+
+file 명령으로 type을 확인 -> swap file 문구를 출력함
+file /swapfile
+/swapfile: Linux/i386 swap file (new style), version 1 (4K pages), size 524287 pages, no label, UUID=1b97c2c7-20c0-4be5-b29d-fff55e3ddd3c
+
+swap 파일 창착 
+swapon /swapfile
+[ swap 활성화 ] : 스왑(swap)파일을 시스템이 사용할 수 있도록 swap 영역 으로 활성화 
+
+free -h
+              total        used        free      shared  buff/cache   available
+Mem:           3942        3153         233           0         556         558
+Swap:          2047           0        2047
+
+cd /usr/share/logstash/bin
+./system-install
+Using bundled JDK: /usr/share/logstash/jdk
+OpenJDK 64-Bit Server VM warning: Option UseConcMarkSweepGC was deprecated in version 9.0 and will likely be removed in a future release.
+/usr/share/logstash/vendor/bundle/jruby/2.5.0/gems/pleaserun-0.0.32/lib/pleaserun/platform/base.rb:112: warning: constant ::Fixnum is deprecated
+
+Successfully created system startup script for Logstash
+
+
+
