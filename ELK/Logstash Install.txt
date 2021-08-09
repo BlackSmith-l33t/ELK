@@ -13,9 +13,72 @@ type=rpm-md
 
 yum -y install logstash
 
+cd /etc/logstash/
+
+vi pipelines.yml
+ 
+# This file is where you define your pipelines. You can define multiple.
+# For more information on multiple pipelines, see the documentation:
+#   https://www.elastic.co/guide/en/logstash/current/multiple-pipelines.html
+ 
+#- pipeline.id: main
+#  path.config: "/etc/logstash/conf.d/*.conf"
+ 
+- pipeline.id: window
+  path.config: "/etc/logstash/windows_conf.d/*.conf"
+ 
+- pipeline.id: linux
+  path.config: "/etc/logstash/linux_conf.d/*.conf"
+
+mkdir windows_conf.d
+vi windows_conf.d/logstash.conf
+
+# windows_conf.d/logstash.conf
+input {
+  beats {
+    port => 5044
+  }
+}
+ 
+output {
+  stdout { codec => json }
+  elasticsearch {
+    hosts => ["http://10.3.205.195:9200"]
+    index => "%{[@metadata][beat]}-%{[@metadata][version]}-%{+YYYY.MM.dd}"
+  }
+}
+
+mkdir linux_conf.d
+vi linux_conf.d/logstash.conf
+
+# linux_conf.d/logstash.conf
+input {
+  beats {
+    port => 50441
+  }
+}
+ 
+output {
+  stdout { codec => json }
+  elasticsearch {
+    hosts => ["http://10.3.205.195:9200"]
+    index => "%{[@metadata][beat]}-%{[@metadata][version]}-%{+YYYY.MM.dd}"
+    #user => "elastic"
+    #password => "changeme"
+  }
+}
+
+cd /usr/share/logstash/bin
+./system-install
+-> Successfully created system startup script for Logstash
+
 systemctl enable logstash
 systemctl start logstash
+
 systemctl status logstash
 -> active (running)
 
+netstat -anpt | grep 5044
+tcp6       0      0 :::5044                 :::*                    LISTEN      18673/java
+tcp6       0      0 :::50441                :::*                    LISTEN      18673/java
 
