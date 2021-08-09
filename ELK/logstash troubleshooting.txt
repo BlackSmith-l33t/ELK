@@ -74,8 +74,6 @@ Swap:          2047           0        2047
 cd /usr/share/logstash/bin
 ./system-install
 Using bundled JDK: /usr/share/logstash/jdk
-OpenJDK 64-Bit Server VM warning: Option UseConcMarkSweepGC was deprecated in version 9.0 and will likely be removed in a future release.
-/usr/share/logstash/vendor/bundle/jruby/2.5.0/gems/pleaserun-0.0.32/lib/pleaserun/platform/base.rb:112: warning: constant ::Fixnum is deprecated
 
 Successfully created system startup script for Logstash
 
