@@ -31,11 +31,9 @@ Swap:            0B          0B          0B
 
 touch /var/spool/swap/swapfile 
 touch: cannot touch ‘/var/spool/swap/swapfile’: No such file or directory
-: 원인은 아직 알수 없으나 먹히지 않음
 
 dd if=/dev/zero of=/var/spool/swap/swapfile count=2048000 bs=1024
 dd: failed to open ‘/var/spool/swap/swapfile’: No such file or directory
-: 원인은 알수 없으나 먹히지 않음
 
 fallocate를 이용해 파일 생성
 fallocate --length 2g /swapfile
