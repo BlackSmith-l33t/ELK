@@ -1,0 +1,86 @@
+1. Apache 설치 
+
+sudo yum -y install httpd
+sudo systemctl start httpd
+
+sudo systemctl status httpd
+
+->  Active: active (running) 
+
+2. Filebeat 설치
+
+sudo rpm --import https://packages.elastic.co/GPG-KEY-elasticsearch
+
+vi /etc/yum.repos.d/Elastic.repo
+
+[elastic-7.x]
+name=Elastic repository for 7.x packages
+baseurl=https://artifacts.elastic.co/packages/7.x/yum
+gpgcheck=1
+gpgkey=https://artifacts.elastic.co/GPG-KEY-elasticsearch
+enabled=1
+autorefresh=1
+type=rpm-md
+
+
+sudo yum install filebeat
+
+2. Filebeat Configuration 수정
+
+vi /etc/filebeat/filebeat.yml
+#=========================== Filebeat inputs =============================
+ 
+filebeat.inputs:
+ 
+# Each - is an input. Most options can be set at the input level, so
+# you can use different inputs for various configurations.
+# Below are the input specific configurations.
+ 
+- type: log
+ 
+  # Change to true to enable this input configuration.
+  enabled: true
+ 
+  # Paths that should be crawled and fetched. Glob based paths.
+  paths:
+    - /var/log/*.log
+    - /var/log/httpd/*_log
+    #- c:\programdata\elasticsearch\logs\*
+#================================ Outputs =====================================
+ 
+# Configure what output to use when sending the data collected by the beat.
+ 
+#-------------------------- Elasticsearch output ------------------------------
+#output.elasticsearch:
+  # Array of hosts to connect to.
+  #hosts: ["localhost:9200"]  
+ 
+  # Enabled ilm (beta) to use index lifecycle management instead daily indices.
+  #ilm.enabled: false
+ 
+  # Optional protocol and basic auth credentials.
+  #protocol: "https"
+  #username: "elastic"
+  #password: "changeme"
+ 
+#----------------------------- Logstash output --------------------------------
+output.logstash:
+  # The Logstash hosts
+  hosts: ["10.3.205.195:5044"]
+
+output.elasticsearch: => 주석처리
+output.logstash: => 활성화
+host = ELK - master IP로 설정
+
+systemctl enable filebeat
+systemctl start filebeat
+
+netstat -anpt | grep 5044
+tcp        0      0 172.31.3.5:40946        52.79.49.213:5044       ESTABLISHED 32686/filebeat
+
+3.  Elasticsearch index 생성 확인
+
+curl localhost:9200/_cat/indices
+
+
+

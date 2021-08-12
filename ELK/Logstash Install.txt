@@ -1,6 +1,7 @@
 rpm --import https://artifacts.elastic.co/GPG-KEY-elasticsearch
 
 vi /etc/yum.repos.d/logstash.repo
+1. Logstash 설치
 
 [logstash-7.x]
 name=Elastic repository for 7.x packages
@@ -13,8 +14,9 @@ type=rpm-md
 
 yum -y install logstash
 
-cd /etc/logstash/
+2. Logstash 파이프라인 설정, window 와 linux port 분리
 
+cd /etc/logstash/
 vi pipelines.yml
  
 # This file is where you define your pipelines. You can define multiple.
