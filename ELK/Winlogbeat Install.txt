@@ -1,0 +1,40 @@
+Winlogbeat
+
+https://www.elastic.co/guide/en/beats/winlogbeat/current/winlogbeat-installation.html
+
+설치파일 다운로드 후 C:\Program Files\에 Winlogbeat으로 파일이름을 변경해서 압축을 해제한다.
+
+cd 'C:\Program Files\Winlogbeat'
+
+vim winlogbeat.yml 
+
+setup.kibana:
+    host: "52.79.49.213:5601"
+
+output.elasticsearch:
+    hosts:["52.79.49.213:9200"]
+
+#output.logstash:
+
+.\install-service-winlogbeat.ps1
+
+ .\winlogbeat.exe setup -e 
+
+Start-Service winlogbeat
+(Stop-Service winlogbeat)
+
+services.msc(winlogbeat running 확인)
+-> Name 		Status 
+    winlogbeat		Running
+
+netstat -an | findstr 5044
+TCP    172.31.8.62:49840      52.79.49.213:5044      ESTABLISHED
+
+ElasticSearch Input Data Check =>
+curl http://localhost:9200/_cat/indices
+ 
+->ElasticSearch에 데이터가 쌓이는 부분 확인
+
+yellow open winlogbeat-7.14.0-2021.08.27        zCrysqKgTeuOlb4aO84xrA 1 1  389    0   1.2mb   1.2mb
+yellow open winlogbeat-7.14.0-2021.08.30-000001 RiUx5McYScul2Qf8AKO3mw 1 1    0    0    208b    208b
+yellow open winlogbeat-7.14.0-2021.08.30        9E6z2SXGRFOKtHrlpLtgdg 1 1  340    0 957.2kb 957.2kb
