@@ -68,6 +68,7 @@ output.logstash:
   # The Logstash hosts
   hosts: ["10.3.205.195:5044"]
 
+enabled: false => true 로 변경
 output.elasticsearch: => 주석처리
 output.logstash: => 활성화
 host = ELK - master IP로 설정
