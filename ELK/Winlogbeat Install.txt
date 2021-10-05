@@ -7,18 +7,34 @@ https://www.elastic.co/guide/en/beats/winlogbeat/current/winlogbeat-installation
 cd 'C:\Program Files\Winlogbeat'
 
 vim winlogbeat.yml 
+! vim이 안깔려 있을 경우
+https://chocolatey.org/install -> Now run the following command에서 복사 후 PowerShell에서 실행
+PS C:\> choco install vim -y
 
-setup.kibana:
-    host: "52.79.49.213:5601"
 
-output.elasticsearch:
-    hosts:["52.79.49.213:9200"]
-
-#output.logstash:
+# https://go.es.io/WinlogbeatConfig
+winlogbeat.event_logs:
+#  - name: Application
+#    ignore_older: 72h
+  - name: Security
+  - name: System
+  - name: Microsoft-Windows-Sysmon/Operational
+ ...
+ #================================ Outputs =====================================
+ # Configure what output to use when sending the data collected by the beat.
+#----------------------------- Elasticsearch output --------------------------------
+#output.elasticsearch:            =>>> 주석처리
+   #hosts: ["localhost:9200" ]    =>>> 주석처리
+#----------------------------- Logstash output ------------------------------------
+output.logstash:                    =>>> 활성화
+  # The Logstash hosts
+  hosts: ["10.3.205.193:50441"]  =>>> 활성화
 
 .\install-service-winlogbeat.ps1
+Status   Name               DisplayName
+------   ----               -----------
+Stopped  winlogbeat         winlogbeat
 
- .\winlogbeat.exe setup -e 
 
 Start-Service winlogbeat
 (Stop-Service winlogbeat)
@@ -28,13 +44,21 @@ services.msc(winlogbeat running 확인)
     winlogbeat		Running
 
 netstat -an | findstr 5044
-TCP    172.31.8.62:49840      52.79.49.213:5044      ESTABLISHED
+TCP    172.31.8.62:49840      52.79.49.213:50441      ESTABLISHED
 
-ElasticSearch Input Data Check =>
+Elasticsearch index & kibana index 생성 확인
 curl http://localhost:9200/_cat/indices
  
-->ElasticSearch에 데이터가 쌓이는 부분 확인
-
-yellow open winlogbeat-7.14.0-2021.08.27        zCrysqKgTeuOlb4aO84xrA 1 1  389    0   1.2mb   1.2mb
-yellow open winlogbeat-7.14.0-2021.08.30-000001 RiUx5McYScul2Qf8AKO3mw 1 1    0    0    208b    208b
-yellow open winlogbeat-7.14.0-2021.08.30        9E6z2SXGRFOKtHrlpLtgdg 1 1  340    0 957.2kb 957.2kb
+green  open .kibana_7.14.0_001                  ykvlDDwkSTG5wDy_zZRMrg 1 0   50   40   2.1mb   2.1mb
+green  open .apm-agent-configuration            yGJF5uwrQ5SqE1u1vYy-kA 1 0    0    0    208b    208b
+green  open .kibana_task_manager_7.14.0_001     Ysh0_0UXRcm_lnMjbx5QMA 1 0   14 3060     1mb     1mb
+yellow open winlogbeat-7.14.0-2021.08.31-000001 HClud7OiSPSLrs1QjmO7ZA 1 1  201    0     1mb     1mb
+yellow open winlogbeat-7.14.1-2021.08.11        lVBDtA6fRBGckCGFrEn_Ig 1 1  732    0   2.2mb   2.2mb
+yellow open winlogbeat-7.14.1-2021.09.02        NNZ9C_wqTbeOEIBIAATP_g 1 1 1186    0   3.9mb   3.9mb
+green  open .tasks                              FH5fKOtTQ7K3sPzINSqs5Q 1 0   16    0  31.4kb  31.4kb
+green  open .kibana-event-log-7.14.0-000001     cOkdkiTwQTq1v9WAdSRDMg 1 0   16    0  25.2kb  25.2kb
+green  open .geoip_databases                    7HHcdIJrRv2W_EoiVBOh4w 1 0   42   34  40.6mb  40.6mb
+green  open .apm-custom-link                    gETMrWu8QZ-fTlAGi8K0jA 1 0    0    0    208b    208b
+yellow open filebeat-7.14.1                     lPSBPFf3RwKlJJ2zWEwpsA 1 1 1571    0 662.9kb 662.9kb
+green  open .async-search                       gRKD2XWJTaWiWtaXvJJpoA 1 0    0    0    231b    231b
+yellow open winlogbeat-7.14.0-2021.08.31        fxzzrrImTICpefGnCU5KTw 1 1  245    0   1.2mb   1.2mb

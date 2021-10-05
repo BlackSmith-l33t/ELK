@@ -27,7 +27,7 @@ systemctl status kibana
 
 vi /etc/kibana/kibana.yml
 
-'#' => 제거
+'#' => 제거 및 변경
 #server.port: 5601  
 #server.host: "0.0.0.0"
 #elasticsearch.hosts: ["http://localhost:9200"] 

@@ -22,7 +22,6 @@ enabled=1
 autorefresh=1
 type=rpm-md
 
-
 sudo yum install filebeat
 
 2. Filebeat Configuration 수정
@@ -39,21 +38,21 @@ filebeat.inputs:
 - type: log
  
   # Change to true to enable this input configuration.
-  enabled: true
+  enabled: false =>>> true로 수정
  
   # Paths that should be crawled and fetched. Glob based paths.
   paths:
     - /var/log/*.log
-    - /var/log/httpd/*_log
+    - /var/log/httpd/*_log  =>>> 추가
     #- c:\programdata\elasticsearch\logs\*
 #================================ Outputs =====================================
  
 # Configure what output to use when sending the data collected by the beat.
  
 #-------------------------- Elasticsearch output ------------------------------
-#output.elasticsearch:
+#output.elasticsearch:  =>>> 주석처리
   # Array of hosts to connect to.
-  #hosts: ["localhost:9200"]  
+  #hosts: ["localhost:9200"]   =>>> 주석처리
  
   # Enabled ilm (beta) to use index lifecycle management instead daily indices.
   #ilm.enabled: false
@@ -64,24 +63,34 @@ filebeat.inputs:
   #password: "changeme"
  
 #----------------------------- Logstash output --------------------------------
-output.logstash:
+output.logstash:  =>>> 활성화
   # The Logstash hosts
-  hosts: ["10.3.205.195:5044"]
-
-enabled: false => true 로 변경
-output.elasticsearch: => 주석처리
-output.logstash: => 활성화
-host = ELK - master IP로 설정
+  hosts: ["10.3.205.195:5044"]  =>>> 활성화
 
 systemctl enable filebeat
+chkconfig --add filebeat
 systemctl start filebeat
 
 netstat -anpt | grep 5044
 tcp        0      0 172.31.3.5:40946        52.79.49.213:5044       ESTABLISHED 32686/filebeat
 
-3.  Elasticsearch index 생성 확인
+3.  Elasticsearch index & kibana index 생성 확인
 
 curl localhost:9200/_cat/indices
+
+green  open .kibana_7.14.0_001                  ykvlDDwkSTG5wDy_zZRMrg 1 0   50   40   2.1mb   2.1mb
+green  open .apm-agent-configuration            yGJF5uwrQ5SqE1u1vYy-kA 1 0    0    0    208b    208b
+green  open .kibana_task_manager_7.14.0_001     Ysh0_0UXRcm_lnMjbx5QMA 1 0   14 3060     1mb     1mb
+yellow open winlogbeat-7.14.0-2021.08.31-000001 HClud7OiSPSLrs1QjmO7ZA 1 1  201    0     1mb     1mb
+yellow open winlogbeat-7.14.1-2021.08.11        lVBDtA6fRBGckCGFrEn_Ig 1 1  732    0   2.2mb   2.2mb
+yellow open winlogbeat-7.14.1-2021.09.02        NNZ9C_wqTbeOEIBIAATP_g 1 1 1186    0   3.9mb   3.9mb
+green  open .tasks                              FH5fKOtTQ7K3sPzINSqs5Q 1 0   16    0  31.4kb  31.4kb
+green  open .kibana-event-log-7.14.0-000001     cOkdkiTwQTq1v9WAdSRDMg 1 0   16    0  25.2kb  25.2kb
+green  open .geoip_databases                    7HHcdIJrRv2W_EoiVBOh4w 1 0   42   34  40.6mb  40.6mb
+green  open .apm-custom-link                    gETMrWu8QZ-fTlAGi8K0jA 1 0    0    0    208b    208b
+yellow open filebeat-7.14.1                     lPSBPFf3RwKlJJ2zWEwpsA 1 1 1571    0 662.9kb 662.9kb  <==
+green  open .async-search                       gRKD2XWJTaWiWtaXvJJpoA 1 0    0    0    231b    231b
+yellow open winlogbeat-7.14.0-2021.08.31        fxzzrrImTICpefGnCU5KTw 1 1  245    0   1.2mb   1.2mb
 
 
 

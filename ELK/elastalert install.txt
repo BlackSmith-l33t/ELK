@@ -1,0 +1,209 @@
+설치 환경 :
+OS : centos
+Elasticsearch (5이상)
+
+yum install python3
+
+yum install python-pip
+ 
+위에 방법으로 설치가 안될 때 진행
+1. curl -O https://bootstrap.pypa.io/get-pip.py
+2, python3 get-pip.py --user
+ 
+ciff 설치 (1.11.5 이상 필요)
+yum install pyhon-ciff*
+ 
+파이썬 Develop 설치 파이썬과 같은 버전으로 설치 진행
+yum install python-devel3*
+ 
+관련 패키지 설치
+pip install "setuptools>=11.3" python setup.py install
+
+pip install elastalert
+ 
+
+2. 설치 기본 경로로 이동
+
+cd /usr/local/lib/python3.6/site-packages/elastalert
+
+예제파일은 https://github.com/Yelp/elastalert/blob/master/config.yaml.example 사이트에 있는
+내용을 복사하여 본인이 지정한 경로에 config.yaml라는 이름으로 저장
+각 설정에 대한 자세한 설명은 https://elastalert.readthedocs.io/en/latest/elastalert.html#configuration 사이트를 참조
+config.yaml에서 설정한 rules_folder 내부에 작성할 rule 파일
+예제파일은 https://github.com/Yelp/elastalert/blob/master/example_rules/example_frequency.yaml 사이트에서 복사하여 config.yaml에서 지정한 rules_folder 경로에 저장
+각 설정에 대한 자세한 설명은 https://elastalert.readthedocs.io/en/latest/ruletypes.html# 사이트를 참조
+
+3. ElastAlert 관련 Yaml 설정
+
+config.yml 과 rule.yml을 설정 해야 합니다.
+config.yaml 주요 옵션
+rules_folder : config.yaml 파일의 경로 기준으로 rule 파일들이 위치한 폴더
+run_every : 알람의 주기를 설정하는 옵션, python 문법으로 timedelta 옵션에 쓸수있는 값들을 넣으면된다. days, seconds, microseconds, milliseconds, minutes, hours, weeks
+buffer_time : 일부 로그소스가 실시간이 아닌 경우 결과를 버퍼링할 최근기간
+es_host : elasticsearch 호스트
+es_port : elasticsearch 포트
+writeback_index : 메타데이터 저장에 사용하는 index, 해당 인덱스는 사용자가 직접 만들어줘야 하는듯하다.
+alert_time_limit : 알람 실패시 재시도할 주기
+
+config.yaml
+# This is the folder that contains the rule yaml files
+# Any .yaml file will be loaded as a rule
+rules_folder: example_rules
+
+# How often ElastAlert will query Elasticsearch
+# The unit can be anything from weeks to seconds
+run_every:
+  minutes: 1
+
+# ElastAlert will buffer results from the most recent
+# period of time, in case some log sources are not in real time
+buffer_time:
+  minutes: 15
+
+# The Elasticsearch hostname for metadata writeback
+# Note that every rule can have its own Elasticsearch host
+es_host: elasticsearch.example.com
+
+# The Elasticsearch port
+es_port: 9200
+
+# Optional URL prefix for Elasticsearch
+#es_url_prefix: elasticsearch
+
+# Connect with TLS to Elasticsearch
+#use_ssl: True
+
+# Verify TLS certificates
+#verify_certs: True
+
+# GET request with body is the default option for Elasticsearch.
+# If it fails for some reason, you can pass 'GET', 'POST' or 'source'.
+# See http://elasticsearch-py.readthedocs.io/en/master/connection.html?highlight=send_get_body_as#transport
+# for details
+#es_send_get_body_as: GET
+ 
+# Option basic-auth username and password for Elasticsearch
+#es_username: someusername
+#es_password: somepassword
+ 
+# The index on es_host which is used for metadata storage
+# This can be a unmapped index, but it is recommended that you run
+# elastalert-create-index to set a mapping
+writeback_index: elastalert_status
+ 
+# If an alert fails for some reason, ElastAlert will retry
+# sending the alert until this time period has elapsed
+alert_time_limit:
+  days: 2
+
+
+4. rule.yaml 설정
+
+name : rule이름, 고유한 이름이므로 중복되어선 안된다.
+type : 알람의 타입, 예제 파일 내용인 frequency 일때는 timeframe, num_events 옵션을 사용한다.
+index : 해당 rule이 탐색할 elasticsearch의 인덱스
+num_events : 정해진 time_frame 시간동안 일정 횟수이상 document 매치시 알람 발생.
+timeframe : num_events 카운트를측정할 시간 단위
+filter : 인덱스에서 매칭시킬 조건.
+query_string : 루씬 쿼리 포맷을 사용하는 방식
+filter: - query: query_string: query: "username: bob" - query: query_string: query: "_type: login_logs" - query: query_string: query: "field: value OR otherfield: othervalue" - query: query_string: query: "this: that AND these: those"
+term : 지정한 필드에 매치할 값을 지정하는 방식
+filter: - term: name_field: "bob" - term: _type: "login_logs"
+terms : term과 같은 개념인데 매칭시킬 값을 여러개로 할수있다. (배열식)
+filter: - terms: field: ["value1", "value2"] # value1 OR value2 - terms: fieldX: ["value1", "value2"] fieldY: ["something", "something_else"] fieldZ: ["foo", "bar", "baz"]
+wildcard : * 문자를 사용하여 유사값을 매칭 시킬수있는 방식
+filter: - query: wildcard: field: "foo*bar"
+range : 숫자형식 필드에 대해 범위를 지정하는 방식
+filter: - range: status_code: from: 500 to: 599
+Negation, and, or : Elasticsearch 2.x 버전에서 사용되는 방식이었으나 5.x버전 이상부터는 작동되지 않고 query_string 방식을 사용한다.
+
+Rule 설정
+rule.yaml
+# Alert when the rate of events exceeds a threshold
+ 
+# (Required)
+# Rule name, must be unique
+name: ERROR Log
+ 
+# (Required)
+# Type of alert.
+# the frequency rule type alerts when num_events events occur with timeframe time
+# type: frequency
+type: any
+ 
+# (Required)
+# Index to search, wildcard supported
+index: logstash-*
+ 
+# use_strftime_index: true
+ 
+# (Required, frequency specific)
+# Alert when this many documents matching the query occur within a timeframe
+# num_events: 1
+ 
+# (Required, frequency specific)
+# num_events must occur within this amount of time to trigger an alert
+# timeframe:
+#     hours: 1
+# num_events must occur within this amount of time to trigger an alert
+timeframe:
+  hours: 4
+
+# (Required)
+# A list of Elasticsearch filters used for find events
+# These filters are joined with AND and nested in a filtered query
+# For more info: http://www.elasticsearch.org/guide/en/elasticsearch/reference/current/query-dsl.html
+filter:
+#- term:
+#    some_field: "some_value"
+- query_string:
+#     query: "event.code:6008"
+     query: "event.code:1030 OR  event.code:36887"
+#     query: "log.level: error"
+# (Required)
+# The alert is use when a match is found
+alert:
+- "email"
+
+alert_subject: "ELK Alert: {0} @ {1}"
+
+alert_subject_args:
+  - host.name
+  - "@timestamp"
+
+email_format: html
+alert_text_type: alert_text_only
+alert_text: "<p>{0}</p><br /><pre>{1}</pre><br /><pre>{2}</pre><a href='http://10.3.205.195:5601/goto/e4845ac336d83e40f282cbcff14b21d6' target='_blank'>Kibana</a>"
+alert_text_args:
+  - "@timestamp"
+  - host.name
+  - message
+#  - use_kibana_dashboard
+
+
+#include: [winlog, event_data]
+
+# (required, email specific)
+# a list of email addresses to send alerts to
+email:
+- "myEmail@gmail.com"
+smtp_host: "10.2.213.99"
+from_addr: "elk-alert@ABCmail.com"
+~ 
+
+테스트 기동
+elastalert-test-rule rule.yaml
+
+5. 모든 설정이 끝났다면 커맨드 실행
+서비스 시작
+elastalert --verbose --rule rule.yaml
+(python -m elastalert.elastalert --verbose --rule example_frequency.yaml)
+(python3.7 -m elastalert.elastalert --verbose --config config.yaml --rule rule.yam)
+
+
+l
+
+
+
+
+

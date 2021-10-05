@@ -2,7 +2,7 @@
 
 - aws EC2 를 이용(Amazon Linux 2 AMI (HVM), SSD Volume Type / t2.medium)
 - java는 1.8 이상 설치
-- elasticsearch version : 7.13.3 
+- elasticsearch version : 7.14 
 
 yum -y update 
 yum list java-*jdk

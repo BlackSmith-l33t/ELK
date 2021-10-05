@@ -38,7 +38,7 @@ vi windows_conf.d/logstash.conf
 # windows_conf.d/logstash.conf
 input {
   beats {
-    port => 5044
+    port => 50441
   }
 }
  
@@ -56,7 +56,7 @@ vi linux_conf.d/logstash.conf
 # linux_conf.d/logstash.conf
 input {
   beats {
-    port => 50441
+    port => 5044
   }
 }
  
