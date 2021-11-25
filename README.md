@@ -1,2 +1,2 @@
 # ELK Stack
-ELK 구축 Tutorial & trouble Shooting
+ELK 구축 Tutorial & trouble shooting
